@@ -1,37 +1,33 @@
-"""Alien Field Notes: The Two Day Earth Review.
+"""Alien Field Notes — a one-line tourist review of Earth.
 
-Writes one original line -- an alien tourist's review of planet Earth,
-at most 200 characters -- to /output/entry.txt.
-
-Deterministic: no network, no wall clock, no randomness, no model calls.
-The review is a fixed string chosen for the judge brief: a clear alien
-visitor's view, one single joke from the alien's angle on ordinary Earth
-life (humans being walked by their dogs), a real-review shape with a
-verdict and rating, and the punch landing at the end.
+The program writes a single original review line (150 characters, no
+trailing newline) to ``entry.txt`` inside the output directory.
 """
 
-import sys
+import os
 from pathlib import Path
 
-REVIEW = (
+
+REVIEW_LINE = (
     "Earth review: the locals let small furry beasts drag them around "
     "on ropes, then scoop the beasts' droppings into bags by hand. "
     "5/5, would visit again."
 )
 
 
-def main(argv):
-    """Write REVIEW to the entry file and report its length."""
-    out = Path(argv[1]) if len(argv) > 1 else Path("/output/entry.txt")
-    text = REVIEW.strip()
-    if not 1 <= len(text) <= 200:
-        raise SystemExit(f"review is {len(text)} chars, must be 1-200")
-    out.parent.mkdir(parents=True, exist_ok=True)
-    # No trailing newline: the gate counts every character in the file.
-    out.write_text(text, encoding="utf-8")
-    print(f"wrote {out} ({len(text)} chars)")
-    return 0
+def output_path() -> Path:
+    """Resolve the destination file, honouring OUTPUT_DIR when set."""
+    base = Path(os.environ.get("OUTPUT_DIR", "/output"))
+    return base / "entry.txt"
+
+
+def main() -> None:
+    # write_text writes the string exactly as given, so no trailing
+    # newline is added — the file holds only the 150-character line.
+    destination = output_path()
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(REVIEW_LINE, encoding="utf-8")
 
 
 if __name__ == "__main__":
-    raise SystemExit(main(sys.argv))
+    main()
